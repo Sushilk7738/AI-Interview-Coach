@@ -68,8 +68,8 @@ class Answer(models.Model):
 
 
 class Evaluation(models.Model):
-    answer = models.OneToOneField(
-        Answer,
+    interview = models.OneToOneField(
+        Interview,
         on_delete=models.CASCADE,
         related_name="evaluation"
     )
