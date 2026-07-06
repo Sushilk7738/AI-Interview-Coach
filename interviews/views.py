@@ -1,10 +1,14 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Role, Question, Interview
-from .serializers import RoleSerializer, QuestionSerializer, InterviewSerializer, AnswerSerializer, InterviewDetailSerializer
+from .models import Role, Question, Interview, Evaluation, Answer
+from .serializers import RoleSerializer, QuestionSerializer, InterviewSerializer, InterviewDetailSerializer, EvaluationSerializer, InterviewSubmissionSerializer
+from django.db import transaction
+
+
 
 from rest_framework import status
+from .ai_service import evaluate_interview
 
 
 class RoleListAPIView(APIView):
@@ -30,7 +34,15 @@ class QuestionListAPIView(APIView):
 
 
 
-class InterviewCreateAPIView(APIView):
+class InterviewAPIView(APIView):
+
+    def get(self, request):
+        interviews = Interview.objects.all()
+        serializer = InterviewSerializer(interviews, many=True)
+
+        return Response(serializer.data)
+
+    
     def post(self, request):
         serializer = InterviewSerializer(data = request.data)
 
@@ -39,16 +51,6 @@ class InterviewCreateAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-class AnswerCreateAPIView(APIView):
-    
-    def post(self, request):
-        serializer = AnswerSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -62,5 +64,96 @@ class InterviewDetailAPIView(APIView):
 
 
 
+
+class SubmitInterviewAPIView(APIView):
+    def post(self, request, pk):
+        interview = get_object_or_404(Interview, id = pk)
+        serializer = InterviewSubmissionSerializer(
+            data = request.data,
+            context = {
+                "interview": interview
+            }
+        )
+        serializer.is_valid(raise_exception=True)
+
+        answers = serializer.validated_data["answers"]
+
+        
+        with transaction.atomic():
+            for answer in answers:
+                Answer.objects.create(
+                    interview = interview,
+                    question=answer["question"],
+                    answer_text = answer["answer_text"],
+                )
+
+        return Response(
+            {
+                "message": "Interview submitted successfully."
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+class EvaluateInterviewAPIView(APIView):
+    
+    def post(self, request, pk):
+        interview = get_object_or_404(Interview, id = pk)
+
+        if not interview.answers.exists():
+            return Response(
+                {
+                    "error": "Interview must have answers before evaluation."
+                },
+                status= status.HTTP_400_BAD_REQUEST
+            )
+        
+        
+        if Evaluation.objects.filter(interview=interview).exists():
+            return Response(
+                {
+                    "message": "This interview has already been evaluated."
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+        
+        
+        try:
+            result = evaluate_interview(interview)
+
+        except Exception as e:
+            return Response(
+                {
+                    "error": str(e)
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        evaluation = Evaluation.objects.create(
+            interview = interview,
+            score = result['score'],
+            strengths = result['strengths'],
+            weaknesses = result['weaknesses'],
+            feedback = result['feedback'],
+        )
+
+        serializer = EvaluationSerializer(evaluation)
+
+        return Response(
+            {
+                "message": "Interview evaluated successfully.",
+                "evaluation": serializer.data,
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+class InterviewEvaluationAPIView(APIView):
+    def get(self, request, pk):
+        interview = get_object_or_404(Interview, id = pk)
+
+        evaluation = get_object_or_404(Evaluation, interview = interview)
+
+        serializer = EvaluationSerializer(evaluation)
+
+        return Response(serializer.data)
 
 

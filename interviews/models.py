@@ -61,6 +61,15 @@ class Answer(models.Model):
     answer_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["interview", "question"],
+                name = "unique_answer_per_question"
+            )
+        ]
+
     def __str__(self):
         return f"Answer for {self.question.id}"
 

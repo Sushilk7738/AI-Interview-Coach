@@ -59,13 +59,39 @@ Return exactly in this format:
             },
             timeout=120,
         )
-
-        result = response.json()["response"]
-
-        result = json.loads(result)
-
-        print(result)
-        return result
         
-    except Exception as e:
-        return str(e)
+        response.raise_for_status()
+
+        ai_response = response.json().get("response")
+
+        if not ai_response:
+            raise Exception(
+                "Empty response from AI model"
+            )
+
+        result = json.loads(ai_response)
+
+        required_fields = [
+            "score",
+            "strengths",
+            "weaknesses",
+            "feedback"
+        ]
+        
+        for field in required_fields:
+            if field not in result:
+                raise Exception(
+                    f"Missing AI field : {field}" 
+                )
+
+        return result
+
+    except json.JSONDecodeError:
+        raise Exception(
+            "AI returned invalid JSON format"
+        )
+        
+    except requests.exceptions.RequestException:
+        raise Exception(
+            "Unable to connect AI service!"
+        )
