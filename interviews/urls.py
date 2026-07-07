@@ -13,6 +13,6 @@ urlpatterns = [
 
     path("interviews/<int:pk>/submit/", SubmitInterviewAPIView.as_view(), name='submit-interview'),
 
-    path('interview/<int:pk>/evaluation/', InterviewEvaluationAPIView.as_view(), name='evaluations'),
+    path('interviews/<int:pk>/evaluation/', InterviewEvaluationAPIView.as_view(), name='evaluations'),
 
 ]

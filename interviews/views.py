@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .models import Role, Question, Interview, Evaluation, Answer
 from .serializers import RoleSerializer, QuestionSerializer, InterviewSerializer, InterviewDetailSerializer, EvaluationSerializer, InterviewSubmissionSerializer
 from django.db import transaction
-
+from rest_framework.permissions import IsAuthenticated
 
 
 from rest_framework import status
@@ -36,8 +36,10 @@ class QuestionListAPIView(APIView):
 
 class InterviewAPIView(APIView):
 
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        interviews = Interview.objects.all()
+        interviews = Interview.objects.filter(user = request.user).select_related("role")
         serializer = InterviewSerializer(interviews, many=True)
 
         return Response(serializer.data)
@@ -47,7 +49,7 @@ class InterviewAPIView(APIView):
         serializer = InterviewSerializer(data = request.data)
 
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user = request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -55,9 +57,14 @@ class InterviewAPIView(APIView):
 
 
 class InterviewDetailAPIView(APIView):
-    
+
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
-        interview = get_object_or_404(Interview, id=pk)
+        interview = get_object_or_404(
+            Interview.objects.select_related("role"),
+            id = pk,
+            user = request.user
+        )
         serializer = InterviewDetailSerializer(interview)
 
         return Response(serializer.data)
@@ -66,8 +73,14 @@ class InterviewDetailAPIView(APIView):
 
 
 class SubmitInterviewAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, pk):
-        interview = get_object_or_404(Interview, id = pk)
+        interview = get_object_or_404(
+            Interview.objects.select_related("role"),
+            id = pk,
+            user = request.user
+        )
         serializer = InterviewSubmissionSerializer(
             data = request.data,
             context = {
@@ -95,9 +108,15 @@ class SubmitInterviewAPIView(APIView):
         )
 
 class EvaluateInterviewAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
     
     def post(self, request, pk):
-        interview = get_object_or_404(Interview, id = pk)
+        interview = get_object_or_404(
+            Interview.objects.select_related("role").prefetch_related("answers__question"),
+            id = pk,
+            user = request.user
+        )
 
         if not interview.answers.exists():
             return Response(
@@ -147,10 +166,19 @@ class EvaluateInterviewAPIView(APIView):
         )
 
 class InterviewEvaluationAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, pk):
-        interview = get_object_or_404(Interview, id = pk)
+        interview = get_object_or_404(
+            Interview.objects.select_related("role"),
+            id = pk,
+            user = request.user
+        )
 
-        evaluation = get_object_or_404(Evaluation, interview = interview)
+        evaluation = get_object_or_404(
+            Evaluation.objects.select_related("interview"),
+            interview = interview
+        )
 
         serializer = EvaluationSerializer(evaluation)
 

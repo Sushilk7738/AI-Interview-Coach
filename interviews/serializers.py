@@ -18,7 +18,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 class InterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
-        fields = "__all__"
+        fields = ["id", "role", "created_at",]
 
 
 class AnswerSerializer(serializers.ModelSerializer):
