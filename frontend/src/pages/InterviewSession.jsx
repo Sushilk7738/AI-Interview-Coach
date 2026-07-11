@@ -1,6 +1,6 @@
 import React from 'react'
 
-const InterviewSesssion = () => {
+const InterviewSession = () => {
   return (
     <div>InterviewSesssion</div>
   )
