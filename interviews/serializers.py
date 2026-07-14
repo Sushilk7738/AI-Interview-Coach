@@ -16,9 +16,38 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class InterviewSerializer(serializers.ModelSerializer):
+    role_name = serializers.CharField(source = "role.name", read_only = True)
+
+    status = serializers.SerializerMethodField()
+    score = serializers.SerializerMethodField()
+    recommendation = serializers.SerializerMethodField()
+    
     class Meta:
         model = Interview
-        fields = ["id", "role", "created_at",]
+        fields = ["id", "role", "role_name", "status", "score", "recommendation", "created_at",]
+
+    def get_status(self, obj):
+        if hasattr(obj, "evaluation"):
+            return "Completed"
+
+        if obj.answers.exists():
+            return "Submitted"
+
+        return "Created"
+
+
+    def get_score(self, obj):
+        if hasattr(obj, "evaluation"):
+            return obj.evaluation.score
+
+        return None
+
+    def get_recommendation(self, obj):
+        if hasattr(obj, "evaluation"):
+            return obj.evaluation.recommendation
+        
+        return ""
+
 
 
 class AnswerSerializer(serializers.ModelSerializer):

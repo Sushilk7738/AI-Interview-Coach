@@ -91,6 +91,8 @@ class Evaluation(models.Model):
 
     feedback = models.TextField()
 
+    recommendation = models.TextField(blank= True, default="")
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

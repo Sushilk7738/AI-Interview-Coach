@@ -11,8 +11,9 @@ export const getQuestions = (roleId)=>{
 }
 
 
-export const getInterviews = ()=>{
-    return api.get("interviews/");
+export const getInterviews = async()=>{
+    const response = await api.get("interviews/");
+    return response.data;
 }
 
 

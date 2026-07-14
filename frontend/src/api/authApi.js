@@ -8,7 +8,16 @@ export const registerUser = (data)=>{
     return api.post("accounts/register/", data);
 }
 
+export const getCurrentUser = async () => {
+    const response = await api.get("accounts/user/me/");
+    return response.data;
+};
 
-export const getCurrentUser = ()=>{
-    return api.get("accounts/user/me/");
+
+export const refreshAccessToken = async (refresh) =>{
+    const response = await api.post("token/refresh/", {
+        refresh,
+    });
+    
+    return response.data
 }

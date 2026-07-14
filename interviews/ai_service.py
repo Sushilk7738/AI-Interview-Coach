@@ -45,8 +45,16 @@ Return exactly in this format:
     "score": 0,
     "strengths": "",
     "weaknesses": "",
-    "feedback": ""
+    "feedback": "",
+    "recommendation": ""
 }
+
+
+Rules:
+- Score must be an integer between 0 and 100.
+- 100 means an outstanding interview.
+- 0 means a completely unsatisfactory interview.
+- Recommendation must be a short actionable next step (1–2 sentences).
 """
 
     try:

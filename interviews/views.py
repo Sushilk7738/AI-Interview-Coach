@@ -39,7 +39,7 @@ class InterviewAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        interviews = Interview.objects.filter(user = request.user).select_related("role")
+        interviews = Interview.objects.filter(user = request.user).select_related("role", "evaluation").prefetch_related("answers")
         serializer = InterviewSerializer(interviews, many=True)
 
         return Response(serializer.data)
@@ -153,6 +153,7 @@ class EvaluateInterviewAPIView(APIView):
             strengths = result['strengths'],
             weaknesses = result['weaknesses'],
             feedback = result['feedback'],
+            recommendation = result['recommendation'],
         )
 
         serializer = EvaluationSerializer(evaluation)
