@@ -1,38 +1,37 @@
 import React, { useEffect, useState } from 'react'
 import { ArrowRight, Target, CheckCircle2, Clock3, Star } from "lucide-react";
-import Navbar from '../components/Navbar';
-import { getCurrentUser } from '../api/authApi';
 import StatCard from "../components/StatCard";
 import InterviewCard from '../components/InterviewCard';
 import AIRecommendationCard from "../components/AIRecommendationCard";
 import PerformanceCard from '../components/PerfomanceCard';
 import { getInterviews } from '../api/interviewApi';
-
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext";
 
 
 const Dashboard = () => {
-  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [interviews, setInterviews] = useState([]);
 
   useEffect(()=>{
 
-    const fetchCurrentUser = async()=>{
+    const fetchInterviews = async () => {
+        try {
 
-      try{
-        const data = await getCurrentUser();
-        setUser(data);
-        
-        const interviewData = await getInterviews();
-        setInterviews(interviewData);
+          const interviewData = await getInterviews();
 
-        console.log(interviewData);
+          setInterviews(interviewData);
 
-      } catch (err) {
-        console.error(err);
-      }
-    };
+        } catch (err) {
 
-    fetchCurrentUser()
+          console.error(err);
+
+        }
+
+      };
+
+      fetchInterviews();
   }, []);
 
 
@@ -45,17 +44,40 @@ const Dashboard = () => {
     )[0];
   
 
+  // total interviews
+  const totalInterviews = interviews.length;
+
+  //completed interviews
+  const completedInterview = interviews.filter(
+    (interview) => interview.status === "Completed"
+  ).length;
+
+  // created interviews
+  const createdInterviews = interviews.filter(
+    (interview) => interview.status === "Created"
+  ).length;
+
+
+  // total score
+  const totalScore = interviews.filter(
+    (interview)=> interview.score !== null
+  ).reduce(
+    (total, interview) => total + interview.score,
+    0
+  ) 
+
+  // avg score
+  const averageScore = completedInterview > 0 ? Math.round(totalScore / completedInterview) : 0;
 
   return (
     <>
-      <Navbar user= {user} />
 
       <main className='bg-slate-900'>
         <div className='mx-auto min-h-[calc(100vh-64px)] max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
           <section className='flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between'>
             <div className='space-y-3'>
               <h1 className='text-3xl font-bold tracking-tight text-white sm:text-4xl'>
-                Welcome back, {user?.username || "User"} 
+                Welcome back, {user?.username || "User"}
               </h1>
 
               <p className='max-w-2xl text-slate-400'>
@@ -68,6 +90,7 @@ const Dashboard = () => {
               <button
                   type="button"
                   className="group flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-all duration-300 hover:-translate-y-1 hover:bg-blue-500 hover:shadow-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 lg:w-auto"
+                  onClick={()=> navigate("/start")}
               >
                 Start Interview
                 <ArrowRight
@@ -86,28 +109,28 @@ const Dashboard = () => {
                 <StatCard
                     icon={Target}
                     title="Total Interviews"
-                    value="24"
+                    value={totalInterviews}
                     color="bg-blue-600"
                 />
 
                 <StatCard
                     icon={CheckCircle2}
                     title="Completed"
-                    value="18"
+                    value={completedInterview}
                     color="bg-emerald-600"
                 />
 
                 <StatCard
                     icon={Clock3}
                     title="Pending"
-                    value="6"
+                    value={createdInterviews}
                     color="bg-amber-500"
                 />
 
                 <StatCard
                     icon={Star}
                     title="Average Score"
-                    value="82%"
+                    value={averageScore}
                     color="bg-violet-600"
                 />
 

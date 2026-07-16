@@ -91,6 +91,14 @@ class SubmitInterviewAPIView(APIView):
 
         answers = serializer.validated_data["answers"]
 
+        if interview.answers.exists():
+            return Response(
+                {
+                    "error": "Interview has already been submitted."
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+
         
         with transaction.atomic():
             for answer in answers:

@@ -1,9 +1,6 @@
 import api from "./axiosInstance";
 
 
-export const getRoles = ()=>{
-    return api.get("roles/");
-}
 
 
 export const getQuestions = (roleId)=>{
@@ -11,16 +8,28 @@ export const getQuestions = (roleId)=>{
 }
 
 
-export const getInterviews = async()=>{
+export const getRoles = async()=>{
+    const response = await api.get("roles/");
+    return response.data;
+}
+
+export const getInterviews = async () => {
     const response = await api.get("interviews/");
     return response.data;
 }
 
-
-export const createInterview = (data)=>{
-    return api.post("interviews/", data);
+export const getInterview = async (id) => {
+    const response = await api.get(`interviews/${id}/`);
+    return response.data;
 }
 
+export const createInterview = async (roleId) => {
+    const response = await api.post("interviews/", {
+        role: roleId,
+    });
+
+    return response.data;
+};
 
 export const submitInterview = (id, data) => {
     return api.post(`interviews/${id}/submit/`, data);
@@ -35,3 +44,5 @@ export const evaluateInterview = (id)=>{
 export const getEvaluation = (id) =>{
     return api.get(`interviews/${id}/evaluation/`);
 }
+
+

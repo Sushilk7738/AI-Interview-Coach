@@ -99,13 +99,44 @@ class InterviewSubmissionSerializer(serializers.Serializer):
                 )
 
         return answers
+    
+    
+class InterviewQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ["id", "question_text"]    
+
 
 class InterviewDetailSerializer(serializers.ModelSerializer):
-    answers = AnswerSerializer(many=True, read_only=True)
+    role_name = serializers.CharField(
+        source="role.name",
+        read_only=True,
+    )
+
+    questions = InterviewQuestionSerializer(
+        source="role.questions",
+        many=True,
+        read_only=True,
+    )
+
+    answers = AnswerSerializer(
+        many=True,
+        read_only=True,
+    )
+
     class Meta:
         model = Interview
-        fields = "__all__"
-
+        fields = [
+            "id",
+            "role",
+            "role_name",
+            "questions",
+            "answers",
+            "created_at",
+        ]
+        
+        
+        
 
 class EvaluationSerializer(serializers.ModelSerializer):
     class Meta:
