@@ -1,5 +1,8 @@
-import requests
+from dotenv import load_dotenv
+from langchain_groq import ChatGroq
+from langchain_core.messages import SystemMessage, HumanMessage
 import json
+import os
 
 def evaluate_interview(interview):
     answers = interview.answers.all()
@@ -58,20 +61,25 @@ Rules:
 """
 
     try:
-        response = requests.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": "llama3",
-                "prompt": prompt,
-                "stream": False,
-            },
-            timeout=120,
+        load_dotenv()
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
+            temperature=0,
         )
+
+        response = llm.invoke(
+            [
+                HumanMessage(
+                    content=prompt
+                )
+            ]
+        )
+
+        ai_response = response.content
+
+        print(ai_response)
+        print(repr(ai_response))
         
-        response.raise_for_status()
-
-        ai_response = response.json().get("response")
-
         if not ai_response:
             raise Exception(
                 "Empty response from AI model"
@@ -99,7 +107,7 @@ Rules:
             "AI returned invalid JSON format"
         )
         
-    except requests.exceptions.RequestException:
-        raise Exception(
-            "Unable to connect AI service!"
-        )
+    except Exception as e:
+        print(type(e))
+        print(e)
+        raise

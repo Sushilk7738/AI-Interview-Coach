@@ -1,13 +1,27 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { evaluateInterview, getInterview, submitInterview } from "../api/interviewApi";
 import { toast } from "sonner";
 
 
+
 const InterviewSession = () => {
+  const navigate = useNavigate();
+  
   const { id } = useParams();
   const [interview, setInterview] = useState(null);
   const [answers, setAnswers] = useState({});
+  const [isEvaluating, setIsEvaluating] = useState(false);
+
+  const loadingSteps = [
+    "Saving your answers...",
+    "Analyzing technical answers...",
+    "Generating AI feedback...",
+    "Preparing recommendations..."
+  ]
+
+  const [currentStep, setCurrentStep] = useState(0);
+  
   
 
   useEffect(()=> {
@@ -16,7 +30,6 @@ const InterviewSession = () => {
 
       try {
         const data = await getInterview(id);
-        console.log(data);
         
         setInterview(data);
       }
@@ -28,10 +41,73 @@ const InterviewSession = () => {
     fetchInterview();
 
   }, [id]);
-  
+
+
+  useEffect(() => {
+    if (!isEvaluating) return;
+
+    const interval = setInterval(() => {
+
+      setCurrentStep((prev) => {
+        if (prev < loadingSteps.length - 1){
+          return prev + 1;
+        }
+
+        return prev;
+      });
+
+    }, 1000);
+
+    return ()=> clearInterval(interval);
+  }, [isEvaluating]);
+
   if (!interview) {
       return null;
   }
+
+
+
+  if (isEvaluating) {
+    return (
+        <main className="flex min-h-screen items-center justify-center bg-slate-900 px-6">
+
+            <div className="w-full max-w-xl rounded-3xl border border-slate-700 bg-slate-800 p-10 text-center shadow-xl">
+
+                <div className="text-6xl">
+                    🧠
+                </div>
+
+                <h1 className="mt-6 text-3xl font-bold text-white">
+                    AI Interview Coach
+                </h1>
+
+                <p className="mt-4 animate-pulse text-lg text-blue-400">
+                    Evaluating your interview...
+                </p>
+
+
+                <div className="mt-10 space-y-4">
+                    {
+                      loadingSteps.map((step, index) => (
+                        <p
+                          key={index}
+                          className="text-left text-slate-300"
+                        >
+                          {index < currentStep && "✅ "}
+                          {index === currentStep && "⏳ "}
+                          {index > currentStep && "⚪ "}
+
+                          {step}
+                        </p>
+                      ))
+                    }
+                </div>
+
+            </div>
+
+        </main>
+    );
+}
 
 
   const handleSubmit = async()=>{
@@ -45,14 +121,21 @@ const InterviewSession = () => {
     
     try {
 
-      console.log(payload);
+      setIsEvaluating(true);
+
       await submitInterview(id, payload);
       await evaluateInterview(id);
 
-      toast.success("Interview evaluated successfully.");
+      // to see loading UI
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+
+      navigate(`/result/${id}`);
     }
     catch (err) {
       toast.error("Failed to evaluate interview."); 
+    }
+    finally {
+      setIsEvaluating(false);
     }
     
   };
@@ -110,9 +193,10 @@ const InterviewSession = () => {
 
             <button
                 onClick={handleSubmit}
-                className="rounded-xl bg-blue-600 px-6 py-3 text-white"
+                disabled={isEvaluating}
+                className="rounded-xl bg-blue-600 px-6 py-3 text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-                Test Payload
+                {isEvaluating ? "Evaluating Interview..." : "Submit"}
             </button>
 
         </section>
