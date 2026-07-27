@@ -1,5 +1,5 @@
 import React from 'react'
-import { Zap, User,ChevronDown  } from "lucide-react";
+import { Zap, User, ChevronDown, Menu  } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef,} from "react";
 import { removeTokens } from '../utils/token';
@@ -7,6 +7,8 @@ import { toast } from 'sonner';
 
 const Navbar = ({ user }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     const navigate = useNavigate();
     const dropdownRef = useRef(null);
 
@@ -64,6 +66,7 @@ const Navbar = ({ user }) => {
         setIsOpen(false);
         toast.success("Logged out successfully");
         navigate("/login", {replace: true});
+        setIsMobileMenuOpen(false);
     }
     
 return (
@@ -85,13 +88,13 @@ return (
                         AI Interview Coach
                     </h1>
 
-                    <p className="text-xs font-medium tracking-wide text-slate-400">
+                    <p className="hidden text-xs font-medium tracking-wide text-slate-400 sm:block">
                         Practice • Evaluate • Improve
                     </p>
                 </div>
             </Link>
 
-            <nav className='flex items-center gap-4'>
+            <nav className='hidden items-center gap-4 md:flex'>
                 {
                     navItems.map((item) => (
                         <NavLink
@@ -120,9 +123,17 @@ return (
                     ))
                 }
             </nav>
+            
 
 
-            <div ref={dropdownRef} className="relative">
+            <button
+                type='button'
+                onClick={()=> setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className='rounded-lg p-2 text-slate-300 transition-colors hover:bg-slate-800 md:hidden'
+            >
+                <Menu size={24} />
+            </button>
+            <div ref={dropdownRef} className="relative hidden md:block">
 
                 <button
                     type="button"
@@ -181,6 +192,36 @@ return (
                 
             </div>
         </div>
+
+        {
+            isMobileMenuOpen && (
+                <div className='flex flex-col items-center border-t border-slate-800 bg-slate-950 px-4 py-3 md:hidden'>
+                    <div className='flex w-full max-w-xs flex-col gap-2'>
+                        {
+                            navItems.map((item) => (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    onClick={()=>setIsMobileMenuOpen(false)}
+                                    className="w-full rounded-lg px-4 py-2 text-center text-slate-300 hover:bg-slate-800 hover:text-white"
+                                >
+                                    {item.name}
+                                </NavLink>
+                            ))
+                            
+                        }
+
+                        <button
+                            type='button'
+                            onClick={handleLogout}
+                            className='block w-full rounded-lg px-4 py-2 text-center text-red-400 hover:bg-red-500/10'
+                        >
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            )
+        }
     </header>
 )
 }

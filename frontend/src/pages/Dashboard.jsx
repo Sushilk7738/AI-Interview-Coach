@@ -68,6 +68,9 @@ const Dashboard = () => {
 
   // avg score
   const averageScore = completedInterview > 0 ? Math.round(totalScore / completedInterview) : 0;
+  const recentInterviews = [...interviews]
+  .sort((a, b) =>new Date(b.created_at) - new Date(a.created_at))
+  .slice(0, 4);
 
   return (
     <>
@@ -149,6 +152,7 @@ const Dashboard = () => {
                 <button
                     type="button"
                     className="text-sm font-medium text-blue-400 transition-colors duration-300 hover:text-blue-300"
+                    onClick={()=>navigate("/interviews")}
                 >
                     View All
                 </button>
@@ -157,7 +161,7 @@ const Dashboard = () => {
 
             <div className="space-y-4">
 
-              {interviews.map((interview) =>(
+              {recentInterviews.map((interview) =>(
                 <InterviewCard
                   key={interview.id}
                   title={interview.role_name}

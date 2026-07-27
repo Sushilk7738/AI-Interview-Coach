@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -6,11 +6,21 @@ import StartInterview from "./pages/StartInterview";
 import Result from "./pages/Result";
 import InterviewSession from './pages/InterviewSession';
 import ProtectedRoute from './routes/ProtectedRoute';
+import { getAccessToken } from './utils/token';
 
 
 const App = () => {
   return (
     <Routes>
+      <Route 
+        path='/' 
+        element = {
+          getAccessToken()
+          ? <Navigate to="/dashboard" replace />
+          : <Navigate to="/login" replace/>
+        } 
+      />
+
       <Route path='/login' element={<Login/>} />
       <Route path='/register' element={<Register/>} />
 
