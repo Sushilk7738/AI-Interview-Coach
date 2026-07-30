@@ -7,7 +7,7 @@ import Result from "./pages/Result";
 import InterviewSession from './pages/InterviewSession';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { getAccessToken } from './utils/token';
-
+import Interviews from './pages/interviews';
 
 const App = () => {
   return (
@@ -27,6 +27,7 @@ const App = () => {
       <Route element={<ProtectedRoute />} >    
 
         <Route path='/dashboard' element={<Dashboard/>} />
+        <Route path='/interviews' element={<Interviews/>} />
         <Route path='/start' element={<StartInterview/>} />
         <Route path='/interview/:id' element={<InterviewSession/>} />
         <Route path='/result/:id' element={<Result/>} />

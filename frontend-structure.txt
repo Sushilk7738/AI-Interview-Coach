@@ -1,0 +1,37 @@
+Folder PATH listing for volume DATA
+Volume serial number is 000001F2 AC69:038D
+D:\AI-INTERVIEW-COACH\FRONTEND\SRC
+¦   App.jsx
+¦   index.css
+¦   main.jsx
+¦   
++---api
+¦       authApi.js
+¦       axiosInstance.js
+¦       interviewApi.js
+¦       
++---components
+¦       AIRecommendationCard.jsx
+¦       AuthLayout.jsx
+¦       InterviewCard.jsx
+¦       Navbar.jsx
+¦       PerfomanceCard.jsx
+¦       StatCard.jsx
+¦       
++---context
+¦       AuthContext.jsx
+¦       
++---pages
+¦       Dashboard.jsx
+¦       InterviewSession.jsx
+¦       Login.jsx
+¦       Register.jsx
+¦       Result.jsx
+¦       StartInterview.jsx
+¦       
++---routes
+¦       ProtectedRoute.jsx
+¦       
++---utils
+        token.js
+        
