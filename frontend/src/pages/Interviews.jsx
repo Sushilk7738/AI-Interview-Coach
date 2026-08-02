@@ -6,24 +6,61 @@ import { useNavigate } from "react-router-dom";
 
 const Interviews = () => {
     const navigate = useNavigate();
-    const[interviews, setInterviews] = useState([]);
-
+    const[interviews , setInterviews] = useState([]);
+    const[loading , setLoading] = useState(true);
+    const[searchTerm , setSearchTerm]= useState("");
+    const[statusFilter, setStatusFilter] = useState("All");
+    
     useEffect(() => {
 
         const fetchInterviews = async () => {
             try {
                 const interviewData = await getInterviews();
                 setInterviews(interviewData);
+                setLoading(false);
             }
             catch (err) {
                 toast.error("failed to load interviews.");
+                setLoading(false);
             }
         };
         fetchInterviews();
     }, []);
 
-    console.log(interviews);
+    
+    const sortedInterviews = [...interviews].sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+    
 
+    const filteredInterviews = sortedInterviews.filter((interview) =>
+        interview.role_name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+    )
+    
+
+    const finalInterviews = filteredInterviews.filter((interview) =>{
+        if (statusFilter === 'All') {
+            return true;
+        }
+
+        return interview.status === statusFilter;
+    });
+    
+    if (loading) {
+        return(
+            <main className="bg-slate-900">
+                <div className="mx-auto flex min-h-[calc(100vh-64px)] max-w-7xl items-center justify-center">
+                    <p className="text-lg text-slate-400 font-semibold">
+                        Loading Interviews... 
+                    </p>
+                </div>
+            </main>
+        )
+    }
+    
+    
 
     return (
         <main className='bg-slate-900'>
@@ -38,9 +75,51 @@ const Interviews = () => {
                     </p>
                 </div>
 
-                <section className='space-y-6'>
+
+                <div className="mb-8">
+                    <input 
+                        type="text" 
+                        placeholder="Search by role..."
+                        value={searchTerm}
+                        onChange={(e)=>setSearchTerm(e.target.value)}
+                        className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-400 focus:border-blue-500 focus:outline-none"
+                    />
+                </div>
+
+                <div className="mb-8 flex flex-wrap gap-3">
                     {
-                        interviews.map((interview) => (
+                        ['All', 'Created', 'Submitted', 'Completed'].map((status) => (
+                            <button
+                                key={status}
+                                type="button"
+                                onClick={() => setStatusFilter(status)}
+                                className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                                    statusFilter === status
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                                }`}
+                            >
+                                {status}
+                            </button>
+                        ))
+                    }
+                </div>
+
+                <section className='space-y-6'>
+                    {finalInterviews.length === 0 && (
+                        <div className="rounded-2xl border border-dashed border-slate-700 py-12 text-center">
+                            <h2 className="text-xl font-semibold text-white">
+                                No interviews found
+                            </h2>
+
+                            <p className="mt-2 text-slate-400">
+                                Try changing your search or filter.
+                            </p>
+                        </div>
+                    )}
+                    
+                    {
+                        finalInterviews.map((interview) => (
                             <div
                                 key={interview.id}
                                 className="rounded-2xl border border-slate-800 bg-slate-800/50 p-6 transition-all duration-300 hover:border-blue-500/40 hover:bg-slate-800 hover:shadow-lg hover:shadow-blue-500/10"
