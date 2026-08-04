@@ -11,9 +11,16 @@ import { AuthProvider } from "../context/AuthContext";
 const ProtectedRoute = () =>{
     const token = getAccessToken();
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
 
     useEffect(() => {
+        
+        if (!token) {
+            setLoading(false);
+            return;
+        }
+        
         const fetchCurrentUser = async () => {
             try {
                 const data = await getCurrentUser();
@@ -22,13 +29,26 @@ const ProtectedRoute = () =>{
             catch (err) {
                 console.error(err);
             }
+            finally {
+                setLoading(false);
+            }
         };
         fetchCurrentUser();
-    }, [])
+    }, []);
     
 
     if (!token){
         return <Navigate to="/login" />;
+    }
+
+    if (loading) {
+        return(
+            <div className="flex min-h-screen items-center justify-center bg-slate-900">
+                <p className="text-lg font-medium text-slate-400">
+                    Loading...
+                </p>
+            </div>
+        )
     }
 
     return (

@@ -171,7 +171,11 @@ return (
 
                         <button
                             type="button"
-                            onClick={()=>setIsOpen(false)}
+                            onClick={()=> {
+                                    setIsOpen(false);
+                                    navigate("/profile");
+                                }
+                            }
                             className="w-full rounded-lg px-4 py-2 text-left text-sm text-slate-300 transition-colors duration-300 hover:bg-slate-800 hover:text-white"
                         >
                             Profile
@@ -211,6 +215,17 @@ return (
                             
                         }
 
+                        <button
+                            type='button'
+                            onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                navigate("/profile");
+                            }}
+                            className="block w-full rounded-lg px-4 py-2 text-center text-slate-300 hover:bg-slate-800 hover:text-white"
+                        >
+                            Profile
+                        </button>
+                        
                         <button
                             type='button'
                             onClick={handleLogout}

@@ -167,6 +167,11 @@ const Dashboard = () => {
                   title={interview.role_name}
                   score={interview.score ?? "--"}
                   status={interview.status}
+                  onClick={()=>
+                    interview.status === "Completed"
+                      ? navigate(`/result/${interview.id}`)
+                      : navigate(`/interview/${interview.id}`)
+                  }
                 />
               ))}
 

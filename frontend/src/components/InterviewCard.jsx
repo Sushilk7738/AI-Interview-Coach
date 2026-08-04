@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
 
-const InterviewCard = ({ title, score, status }) => {
+const InterviewCard = ({ title, score, status, onClick }) => {
     const buttonText = status === "Completed" ? "View Report" : "Continue";
 
     return (
@@ -35,6 +35,7 @@ const InterviewCard = ({ title, score, status }) => {
 
             <button
                 type="button"
+                onClick={onClick}
                 className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
                     status === "Completed"
                         ? "text-blue-400 hover:bg-slate-700 hover:text-white"
