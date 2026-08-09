@@ -26,6 +26,7 @@ SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", cast=bool)
+
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
     default="localhost,127.0.0.1"
@@ -63,7 +64,10 @@ ROOT_URLCONF = 'config.urls'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://ai-interview-coach-frontend-ivory.vercel.app",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 TEMPLATES = [
     {
