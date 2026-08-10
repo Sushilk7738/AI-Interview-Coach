@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import RegisterSerializer, UserSerializer
 from rest_framework.permissions import IsAuthenticated
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 
 class RegisterAPIView(APIView):
@@ -32,3 +34,10 @@ class CurrentUserAPIView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+
+@require_GET
+def health_check(request):
+    return JsonResponse({
+        "status": "ok"
+    })

@@ -5,9 +5,13 @@ import { loginUser } from "../api/authApi";
 import { saveTokens } from "../utils/token";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import useBackendStatus from '../hooks/useBackendStatus';
+
 
 const Login = () => {
   const navigate = useNavigate();
+
+  const backendReady = useBackendStatus();
 
   const [formData, setFormData] = useState({
     username:"",
@@ -47,6 +51,23 @@ const Login = () => {
     }
   };
   
+
+  if (!backendReady) {
+    return(
+      <div className='min-h-screen flex items-center justify-center bg-gray-900 text-white'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4'></div>
+          <h2 className='text-xl font-semibold mb-2'>
+              Waking up server...
+          </h2>
+          <p className='text-gray-200'>
+            Please wait a few seconds
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <AuthLayout
       title= "Welcome Back 👋"
@@ -74,9 +95,10 @@ const Login = () => {
 
         <button
           type='submit'
+          disabled = {!backendReady}
           className='mt-6 w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 active:scale-95'
         >
-          Sign In
+          {backendReady ? "Sign In" : "Starting server..."}
         </button>
 
             
