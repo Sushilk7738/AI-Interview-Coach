@@ -11,12 +11,15 @@ const Interviews = () => {
     const[searchTerm , setSearchTerm]= useState("");
     const[statusFilter, setStatusFilter] = useState("All");
     
+    
     useEffect(() => {
 
         const fetchInterviews = async () => {
             try {
                 const interviewData = await getInterviews();
-                setInterviews(interviewData);
+                console.log(interviewData);
+                
+                setInterviews(interviewData.results || []);
                 setLoading(false);
             }
             catch (err) {
@@ -184,6 +187,7 @@ const Interviews = () => {
                     }
                     
                 </section>
+
             </div>
         </main>
     )

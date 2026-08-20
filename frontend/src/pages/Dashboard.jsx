@@ -21,8 +21,8 @@ const Dashboard = () => {
 
           const interviewData = await getInterviews();
 
-          setInterviews(interviewData);
-
+          setInterviews(interviewData.results || []);
+          
         } catch (err) {
 
           console.error(err);

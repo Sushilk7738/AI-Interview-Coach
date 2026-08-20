@@ -3,6 +3,9 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
 import json
 import os
+from groq import Groq
+
+
 
 def evaluate_interview(interview):
     answers = interview.answers.all()
@@ -62,8 +65,14 @@ Rules:
 
     try:
         load_dotenv()
+        
+        client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+
+        models = client.models.list()
+
+        print([model.id for model in models.data])
         llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
+            model="qwen/qwen3.6-27b",
             temperature=0,
         )
 
@@ -84,6 +93,9 @@ Rules:
             raise Exception(
                 "Empty response from AI model"
             )
+
+        if "</think>" in ai_response:
+            ai_response = ai_response.split("</think>", 1)[1].strip()
 
         result = json.loads(ai_response)
 

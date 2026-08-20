@@ -12,6 +12,7 @@ from .ai_service import evaluate_interview
 
 
 class RoleListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         roles = Role.objects.all()
         serializer = RoleSerializer(roles, many=True)

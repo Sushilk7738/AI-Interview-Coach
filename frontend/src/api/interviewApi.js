@@ -8,13 +8,13 @@ export const getQuestions = (roleId)=>{
 }
 
 
-export const getRoles = async()=>{
+export const getRoles = async () => {
     const response = await api.get("roles/");
     return response.data;
-}
+};
 
-export const getInterviews = async () => {
-    const response = await api.get("interviews/");
+export const getInterviews = async (page = 1) => {
+    const response = await api.get(`interviews/?page=${page}`);
     return response.data;
 }
 

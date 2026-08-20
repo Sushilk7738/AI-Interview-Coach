@@ -3,7 +3,8 @@ import { getAccessToken, getRefreshToken, saveTokens, removeTokens } from '../ut
 import { refreshAccessToken } from './authApi';
 
 const api = axios.create({
-baseURL: 'https://ai-interview-coach-backend-lz1i.onrender.com/api/',
+// baseURL: 'https://ai-interview-coach-backend-lz1i.onrender.com/api/',
+baseURL: 'http://127.0.0.1:8000/api/',
 });
 
 api.interceptors.request.use(

@@ -154,13 +154,13 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     
-    "DEFAULT_THROTTLE_CLASSES": [
-        "rest_framework.throttling.UserRateThrottle",
-    ],
+    # "DEFAULT_THROTTLE_CLASSES": [
+    #     "rest_framework.throttling.UserRateThrottle",
+    # ],
     
-    "DEFAULT_THROTTLE_RATES": {
-        "user": "10/minute",
-    },
+    # "DEFAULT_THROTTLE_RATES": {
+    #     "user": "10/minute",
+    # },
     
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 5,
