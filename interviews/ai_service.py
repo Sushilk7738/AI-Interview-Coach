@@ -1,9 +1,12 @@
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 import json
 import os
 from groq import Groq
+from google import genai
+
 
 
 
@@ -66,13 +69,14 @@ Rules:
     try:
         load_dotenv()
         
-        client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+        # client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
         models = client.models.list()
 
         print([model.id for model in models.data])
-        llm = ChatGroq(
-            model="qwen/qwen3.6-27b",
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash",
             temperature=0,
         )
 
