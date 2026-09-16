@@ -72,9 +72,6 @@ Rules:
         # client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
         client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-        models = client.models.list()
-
-        print([model.id for model in models.data])
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
             temperature=0,
